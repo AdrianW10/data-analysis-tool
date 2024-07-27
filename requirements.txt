@@ -1,6 +1,5 @@
 langchain_experimental==0.0.57
 langchain_openai==0.1.6
-lida==0.0.14
 matplotlib==3.8.4
 openai==1.25.1
 pandas==1.5.3

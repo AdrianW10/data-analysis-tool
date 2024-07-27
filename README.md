@@ -1,4 +1,4 @@
-# AI Analysis Streamlit App
+# AI Analysis Streamlit App 🤖
 
 ## Description
 This Streamlit application provides an interactive platform for data analysis 
@@ -41,15 +41,19 @@ bar charts, and more.
 
 ## Installation (Local)
 If you wish to run the app locally:
-1. Clone the repository:
+
+1. Get an OpenAI API key and set it as an environment variable in an `.env` file.
+
+2. Clone the repository:
    ```bash
    git clone https://github.com/AdrianW10/data-analysis-tool.git
 
-2. Run the app:   
+3. Run the app:   
     ```bash
+    pip install -r requirements.txt
     streamlit run main.py
 
 ## Configuration
 The tool is already preconfigured and requires no further settings. 
-However, if necessary, you can adapt the 'config.toml' file in the '.streamlit' 
+However, if necessary, you can adapt the `config.toml` file in the `.streamlit` 
 folder to change the colors and font of the tool.
