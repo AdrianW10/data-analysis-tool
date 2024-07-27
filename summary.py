@@ -37,5 +37,5 @@ def verbal_summary(streamed_data, option_summary):
     return verbal_summary
 
 def get_exemplary_questions(verbal_summary):
-    qestions = re.search(r"(Exemplary questions:\n.*)",verbal_summary,re.DOTALL)
-    return qestions.group(1) if qestions else None
+    qestions = re.search(r"(Exemplary questions:.*)",verbal_summary,re.DOTALL)
+    return qestions.group(1) 

@@ -66,7 +66,7 @@ if menu == "Home":
 ######### Data Analysis #########                                       
 elif menu == "Data Analysis":
     st.session_state.tab_visited = True
-    st.title("AI-Powered Data Analysis")
+    st.title("AI Driven Data Analysis")
     if not st.session_state.data_uploaded:
         option_use = csv_option_select()
     file_uploader = file_manager(test_data)
@@ -140,11 +140,35 @@ elif menu == "Interactive Data Visualization":
         else:
             st.error("Data cannot be processed")
 
-######### Info #########  
+######### Info - footer #########  
 
-for _ in range(49): 
-    st.sidebar.write("")
+footer = """
+<style>
+    .footer {
+        position: fixed;
+        left: 0;         
+        bottom: 0;
+        width: 100%;
+        background-color: #0e1117;
+        color: white;
+        text-align: left;
+        padding: 10px 0;
+        font-family: 'Arial', sans-serif;
+        font-size: small;
+        border-top: 1px solid #444;
+    }
+    .footer a {
+        color: #1f77b4;
+        text-decoration: none;
+        margin: 0 10px;
+    }
+    .footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+<div class="footer">
+   <a > </a>|&nbsp;&nbsp;<span>AI Driven Data Analysis</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span>2024</span>&nbsp;&nbsp;|<a href="https://github.com/AdrianW10/data-analysis-tool.git" target="_blank">GitHub Repository</a>|
+</div>
+"""
 
-with st.sidebar.empty():
-    st.markdown("""<hr>""", unsafe_allow_html=True)
-    st.markdown("""<small>[AI Analysis Streamlit App](https://github.com/AdrianW10/data-analysis-tool.git)  | Jul 2024 | [Adrian Wagner](https://github.com/AdrianW10)</small>""", unsafe_allow_html=True)
+st.sidebar.markdown(footer, unsafe_allow_html=True)

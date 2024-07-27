@@ -30,7 +30,8 @@ def use_chatGPT(query, option_summary):
                 answers questions about a CSV file based on the provided data 
                 information. """, 
                 
-                "role": "user", "content": f"{pre_promt}" if option_summary else f"{pre_promt_no_sum}"
+                "role": "user", "content": f"{pre_promt}" if option_summary 
+                                                    else f"{pre_promt_no_sum}"
                 }
 
     template["content"] += query
