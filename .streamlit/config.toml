@@ -1,0 +1,6 @@
+[theme]
+primaryColor = "#1f77b4"  # Blau für primäre Akzente
+backgroundColor = "#0e1117"  # Schwarzer Hintergrund
+secondaryBackgroundColor = "#363a46"  # Grau für sekundäre Hintergründe
+textColor = "#ffffff"  # Weißer Text für guten Kontrast
+font = "sans serif"
