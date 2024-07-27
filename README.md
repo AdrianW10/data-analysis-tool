@@ -46,7 +46,7 @@ If you wish to run the app locally:
    git clone https://github.com/AdrianW10/data-analysis-tool.git
 
 2. Run the app:   
-
+    ```bash
     streamlit run main.py
 
 ## Configuration

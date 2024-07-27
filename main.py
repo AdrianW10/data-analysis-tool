@@ -12,8 +12,9 @@ from interactive_plot import interactive_plot
 from session_variables import initialize_variables
 
 ###########################################################
-########## Initialization and Prerequisites ###########
+########## Initialization and Prerequisites ###############
 ###########################################################
+
 if "initialized" not in st.session_state:
     st.session_state.initialized = None
 
@@ -135,3 +136,12 @@ elif menu == "Interactive Data Visualization":
                 interactive_plot(st.session_state.df_filtered, True)
         else:
             st.error("Data cannot be processed")
+
+######### Info #########  
+
+for _ in range(49): 
+    st.sidebar.write("")
+
+with st.sidebar.empty():
+    st.markdown("""<hr>""", unsafe_allow_html=True)
+    st.markdown("""<small>[AI Analysis Streamlit App](https://github.com/AdrianW10/data-analysis-tool.git)  | Jul 2024 | [Adrian Wagner](https://github.com/AdrianW10)</small>""", unsafe_allow_html=True)
