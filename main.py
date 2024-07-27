@@ -1,18 +1,18 @@
-#### Haputprogramm zur Ausführung ####
+#### Main Program to Run ####
 
 ###### Import ######
 import streamlit as st 
 st.set_page_config(layout="wide", page_title="Data Analysis", 
                    page_icon="favicon.ico")
 
-###### Import von Funktionen aus Dateien ######
+###### Import Functions from Files ######
 from data_processor import filter_data, get_user_selection, upload_manager, file_manager, csv_option_select
 from llm import chatbot
 from interactive_plot import interactive_plot
 from session_variables import initialize_variables
 
 ###########################################################
-########## Initialisierung und Vorraussetzungen ###########
+########## Initialization and Prerequisites ###########
 ###########################################################
 if "initialized" not in st.session_state:
     st.session_state.initialized = None
@@ -24,14 +24,14 @@ if not st.session_state.initialized:
 test_data = "titanic.csv"
 
 ######################
-## Anwendung selbst ##
+## Application ##
 ######################
-menu = st.sidebar.selectbox("Wähle eine Option", ["Startseite", "Datenanalyse", 
-                                "Interaktive Datenvisualisierung"])
+menu = st.sidebar.selectbox("Choose an Option", ["Home", "Data Analysis", 
+                                "Interactive Data Visualization"])
 st.sidebar.button("Refresh")
 
-######### Startseite #########
-if menu == "Startseite":
+######### Home #########
+if menu == "Home":
     st.image("header.jpeg", use_column_width=True)    
     
     if not st.session_state.data_uploaded:
@@ -40,7 +40,7 @@ if menu == "Startseite":
     file_uploader = file_manager(test_data) 
         
     if not st.session_state.data_uploaded:
-        option_summary = st.checkbox("Verbale Zusammenfassung erzeugen")
+        option_summary = st.checkbox("Generate Verbal Summary")
     else: 
         option_summary = False
         
@@ -48,24 +48,24 @@ if menu == "Startseite":
         if not st.session_state.data_uploaded:
             upload_manager(file_uploader, option_summary, option_use)
         if st.session_state.verbal_summary and st.session_state.tab_visited:
-            with st.expander("Verbale Zusammenfassung ansehen"):
+            with st.expander("View Verbal Summary"):
                 st.write(st.session_state.verbal_summary)
-        st.write(f"Anzahl der Tokens: ≈ {st.session_state.num_tokens}")
-        st.write(f"Maximale Tokens: {8192}")
+        st.write(f"Number of Tokens: ≈ {st.session_state.num_tokens}")
+        st.write(f"Maximum Tokens: {8192}")
         try: st.progress(st.session_state.token_usage_percent)
-        except: st.error("Tokenlimit überschritten, keine Anfragen an die KI möglich.")
-        st.write(f"Token-Verbrauch: {st.session_state.token_usage_percent}%")
-        st.info("Übersicht über deine Daten")
+        except: st.error("Token limit exceeded, no requests to the AI possible.")
+        st.write(f"Token Usage: {st.session_state.token_usage_percent}%")
+        st.info("Overview of your Data")
         if not st.session_state.data.empty:
             st.write(st.session_state.data.head(10))
         else:
-            st.error("Daten können nicht verarbeitet werden")
+            st.error("Data cannot be processed")
         
         
-######### Datenanalyse #########                                       
-elif menu == "Datenanalyse":
+######### Data Analysis #########                                       
+elif menu == "Data Analysis":
     st.session_state.tab_visited = True
-    st.title("Lasse deine Daten automatisch analysieren")
+    st.title("AI-Powered Data Analysis")
     if not st.session_state.data_uploaded:
         option_use = csv_option_select()
     file_uploader = file_manager(test_data)
@@ -73,43 +73,43 @@ elif menu == "Datenanalyse":
         if not st.session_state.data_uploaded:
             upload_manager(file_uploader)
         if not st.session_state.data.empty:
-            with st.expander("Deskriptive Statistik der numerischen Daten"):
+            with st.expander("Descriptive Statistics of Numeric Data"):
                 st.write(st.session_state.df.describe())
-            with st.expander("Zusammenfassung ansehen"): 
+            with st.expander("View Summary"): 
                     st.text(st.session_state.data_summary)
-            option_analysis = st.sidebar.radio("Wie möchtest du vorgehen?",
-                                    ["Kompletten Datensatz verwenden", 
-                                    "Daten erst manuell filtern"])
-            if option_analysis == "Kompletten Datensatz verwenden":
+            option_analysis = st.sidebar.radio("How would you like to proceed?",
+                                    ["Use entire dataset", 
+                                    "Filter data manually first"])
+            if option_analysis == "Use entire dataset":
                 st.session_state.df_filtered = None
-                option_answer = st.checkbox("Gedankenprozess anzeigen")
-                option_plot = st.checkbox("Grafik erstellen")
+                option_answer = st.checkbox("Show Thought Process")
+                option_plot = st.checkbox("Create Chart")
                 chatbot(option_answer, option_plot, st.session_state.messages)
             else: 
-                kategorien, current_selection = get_user_selection(
+                categories, current_selection = get_user_selection(
                                                 st.session_state.df, 
                                                 multicat=True, 
                                                 subcat=False,
                                                 )
-                st.session_state.df_filtered = filter_data(st.session_state.df[kategorien], kategorien)
+                st.session_state.df_filtered = filter_data(st.session_state.df[categories], categories)
                 
                 col1, col2 = st.columns([1, 1])
                 with col1:
-                    st.info("Gefilterter Datensatz")
+                    st.info("Filtered Dataset")
                     st.write(st.session_state.df_filtered)
                 with col2:
-                    st.info("Erfahre mehr über deine gefilterten Daten")
-                    option_answer = st.checkbox("Gedankenprozess anzeigen")
-                    option_plot = st.checkbox("Grafik erstellen")
+                    st.info("Learn more about your filtered data")
+                    option_answer = st.checkbox("Show Thought Process")
+                    option_plot = st.checkbox("Create Chart")
                     chatbot(option_answer, option_plot, st.session_state.messages1)
         else:
-            st.error("Daten können nicht verarbeitet werden")
+            st.error("Data cannot be processed")
            
-######### Interaktive Datenvisualisierung #########  
+######### Interactive Data Visualization #########  
                 
-elif menu == "Interaktive Datenvisualisierung":
+elif menu == "Interactive Data Visualization":
     st.session_state.tab_visited = True
-    st.title("Interaktive Datenvisualisierung")
+    st.title("Interactive Data Visualization")
     if not st.session_state.data_uploaded:
         option_use = csv_option_select()
     file_uploader = file_manager(test_data)
@@ -117,21 +117,21 @@ elif menu == "Interaktive Datenvisualisierung":
         if not st.session_state.data_uploaded:
             upload_manager(file_uploader)
         if not st.session_state.data.empty:
-            option_analysis = st.sidebar.radio("Wie möchtest du vorgehen?",
-                                    ["Kompletten Datensatz verwenden", 
-                                    "Daten erst manuell filtern"])
-            if option_analysis == "Kompletten Datensatz verwenden":
+            option_analysis = st.sidebar.radio("How would you like to proceed?",
+                                    ["Use entire dataset", 
+                                    "Filter data manually first"])
+            if option_analysis == "Use entire dataset":
                 st.session_state.df_filtered = None
+                with st.expander("View Summary"): 
+                    st.text(st.session_state.data_summary)
                 interactive_plot(st.session_state.df)
             else: 
-                kategorien, current_selection = get_user_selection(
+                categories, current_selection = get_user_selection(
                                                 st.session_state.df, 
                                                 multicat=True, 
                                                 subcat=False,
                                                 )
-                st.session_state.df_filtered = filter_data(st.session_state.df[kategorien], kategorien)
+                st.session_state.df_filtered = filter_data(st.session_state.df[categories], categories)
                 interactive_plot(st.session_state.df_filtered, True)
         else:
-            st.error("Daten können nicht verarbeitet werden")
-    
-
+            st.error("Data cannot be processed")

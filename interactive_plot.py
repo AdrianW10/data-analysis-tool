@@ -2,57 +2,52 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 
-#from data_processor import filter_data, get_user_selection
-# Methode, um die Daten benutzerdefiniert und interaktiv zu plotten
+# Method to plot the data in a customized and interactive way
 def interactive_plot(df, filter=False):
 
     if filter:
-        with st.expander("Gefilterte Daten ansehen"):
+        with st.expander("View Filtered Data"):
             st.write(df)
 
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-    ["Scatter Plot", "Line Chart", "Bar Chart","Pie Chart", "Boxplot", "Histogram"])
+    ["Scatter Plot", "Line Chart", "Bar Chart", "Pie Chart", "Boxplot", 
+                                                                "Histogram"])
     
 
     with tab1:
-        st.subheader("Interaktive Scatter Plots")
+        st.subheader("Interactive Scatter Plots")
         col1, col2 = st.columns(2)
 
-        # Auswahl der Achsen
-        x1 = col1.selectbox('X - Achse', options=df.columns)
-        y1 = col2.selectbox('Y - Achse', options=df.columns)
+        x1 = col1.selectbox('X - Axis', options=df.columns)
+        y1 = col2.selectbox('Y - Axis', options=df.columns)
 
-        # Farben für Datenpunkte und Regressionslinie auswählen
-        point_color = st.color_picker('Wähle eine Farbe für die Datenpunkte',"#1f77b4")
-
-        # Scatter-Plot erstellen
-        if st.checkbox("Regressionslinie anzeigen"):
-            line_color = st.color_picker('Wähle eine Farbe für die Trendlinie',"#1f77b4")
-            plot = px.scatter(df, x=x1, y=y1, trendline="ols", trendline_color_override=line_color)
+        point_color = st.color_picker('Choose a color for data points', 
+                                                                    "#1f77b4")
+        if st.checkbox("Show regression line"):
+            line_color = st.color_picker('Choose a color for the trendline', 
+                                                                    "#1f77b4")
+            plot = px.scatter(df, x=x1, y=y1, trendline="ols", 
+                                        trendline_color_override=line_color)
         else:
             plot = px.scatter(df, x=x1, y=y1)
 
-        # Datenpunktfarbe anpassen
         plot.update_traces(marker=dict(color=point_color))
-
         st.plotly_chart(plot, use_container_width=True)
 
     with tab2:
-        st.subheader("Interaktive Liniendiagramme")
+        st.subheader("Interactive Line Charts")
         col1, col2 = st.columns(2)
 
-        # Mehrfachauswahl für die X-Achse
-        x2 = col1.selectbox('  X - Achse', options=df.columns, index=None)
-        y2 = col2.multiselect('Y - Achsen', options=df.columns)
+        x2 = col1.selectbox('  X - Axis', options=df.columns, index=None)
+        y2 = col2.multiselect('Y - Axes', options=df.columns)
 
         if x2 and y2:
-            # Farben für jede Linie auswählen
             colors = []
             for y in y2:
-                color = st.color_picker(f'Wähle eine farbe für {y}', "#1f77b4", key=y)
+                color = st.color_picker(f'Choose a color for {y}', "#1f77b4", 
+                                                                        key=y)
                 colors.append(color)
 
-            # Erstellen der Linien für das Diagramm
             data = []
             for y, color in zip(y2, colors):
                 data.append(go.Scatter(
@@ -63,7 +58,6 @@ def interactive_plot(df, filter=False):
                     line=dict(color=color)
                 ))
 
-            # Erstellen des Layouts für das Diagramm
             layout = go.Layout(
                 xaxis_title=x2,
                 yaxis_title='Values',
@@ -71,28 +65,25 @@ def interactive_plot(df, filter=False):
                 paper_bgcolor='rgba(0,0,0,0)'
             )
 
-            # Erstellen der Figur
             fig = go.Figure(data=data, layout=layout)
-
-            # Anzeigen des Diagramms
             st.plotly_chart(fig, use_container_width=True)
 
     with tab3:
-        st.subheader("Interaktive Balkendiagramme")
+        st.subheader("Interactive Bar Charts")
         col1, col2 = st.columns(2)
 
-        x3 = col1.multiselect(' X - Achse', options=df.columns)
-        y3 = col2.selectbox(' Y - Achse', options=df.columns, index=None)
+        x3 = col1.multiselect(' X - Axis', options=df.columns)
+        y3 = col2.selectbox(' Y - Axis', options=df.columns, index=None)
 
         if x3 and y3:
             colors = []
             for category in x3:
-                color = st.color_picker(f'Wähle eine farbe für {category}', "#1f77b4", key=category)
+                color = st.color_picker(f'Choose a color for {category}', 
+                                                    "#1f77b4", key=category)
                 colors.append(color)
 
-            show_barmode = st.selectbox("Wähle den Balkenmodus", options=["group", "stack"], index=0)
-
-            # Erstellen der Balken für das Diagramm
+            show_barmode = st.selectbox("Choose bar mode", options=["group", 
+                                                            "stack"], index=0)
             data = []
             for category, color in zip(x3, colors):
                 data.append(go.Bar(
@@ -101,69 +92,64 @@ def interactive_plot(df, filter=False):
                     name=category,
                     marker_color=color,
                 ))
+
             n = len(x3)
-            # Erstellen des Layouts für das Diagramm
             layout = go.Layout(
                 barmode=show_barmode,
-                xaxis_title='Kategories' if n >1 else x3[0],
+                xaxis_title='Categories' if n > 1 else x3[0],
                 yaxis_title=y3,
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)'
             )
 
-            # Erstellen der Figur
             fig = go.Figure(data=data, layout=layout)
-
-            # Anzeigen des Diagramms
             st.plotly_chart(fig, use_container_width=True)
     
     with tab4:
-        st.subheader("Interaktive Kuchendiagramme")
+        st.subheader("Interactive Pie Charts")
         col1, col2 = st.columns(2)
 
-        # Auswahl der Kategorien und Werte
-        categories = col1.selectbox('Wähle eine Kategorie', options=df.columns, index=None)
-        values = col2.selectbox('Wähle einen Wert', options=df.columns, index=None)
-
-        # Farben für jedes Segment auswählen
+        categories = col1.selectbox('Choose a category', options=df.columns, 
+                                                                    index=None)
+        values = col2.selectbox('Choose a value', options=df.columns, 
+                                                                    index=None)
         if categories:
             unique_categories = df[categories].unique()
             colors = {}
-            n = len(unique_categories) 
+            n = len(unique_categories)
             i = 0
             for _ in range((n // 4) + 1):
                 for col in st.columns(4):
                     if i < n:
                         category = unique_categories[i]
-                        color = col.color_picker(f'Wähle eine farbe für {category}', "#1f77b4", key=category)
+                        color = col.color_picker(
+                            f'Choose a color for {category}', 
+                            "#1f77b4", key=category
+                            )
                         colors[category] = color
                         i += 1
-                    else: 
+                    else:
                         col.empty()
-        
 
-            # Erstellen des Kuchendiagramms
             fig = px.pie(df, names=categories, values=values, color=categories, 
                         color_discrete_map=colors)
 
             st.plotly_chart(fig, use_container_width=True)
 
     with tab5:
-        st.subheader("Interaktive Boxplots")
+        st.subheader("Interactive Boxplots")
         col1, col2 = st.columns(2)
 
-        # Auswahl der Achsen
-        x4= col1.multiselect('X - Achsen', options=df.columns)
-        y4 = col2.selectbox('  Y - Achse', options=df.columns, index=None)
+        x4 = col1.multiselect('X - Axes', options=df.columns)
+        y4 = col2.selectbox('  Y - Axis', options=df.columns, index=None)
 
-        # Farben für jede Y-Achsen Kategorie auswählen
         if x4 and y4:
             colors = []
             for x in x4:
-                color = st.color_picker(f'Pick a color for {x}', "#1f77b4", key=x)
+                color = st.color_picker(f'Pick a color for {x}', "#1f77b4", 
+                                                                        key=x)
                 colors.append(color)
 
-            # Erstellen der Boxplots für das Diagramm
             data = []
             for x, color in zip(x4, colors):
                 data.append(go.Box(
@@ -172,34 +158,25 @@ def interactive_plot(df, filter=False):
                     name=x,
                     marker_color=color
                 ))
+
             n = len(x4)
-            # Erstellen des Layouts für das Diagramm
             layout = go.Layout(
-                xaxis_title="Kategories" if n > 1 else x4[0],
+                xaxis_title="Categories" if n > 1 else x4[0],
                 yaxis_title=y4,
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)'
             )
-
-            # Erstellen der Figur
+            
             fig = go.Figure(data=data, layout=layout)
-
-            # Anzeigen des Diagramms
             st.plotly_chart(fig, use_container_width=True)
 
     with tab6:
-        st.subheader("Interaktive Histogramme")
-
-        # Auswahl der Kategorie
-        category = st.selectbox(' Wähle eine Kategorie', options=df.columns, index=None)
+        st.subheader("Interactive Histograms")
+        category = st.selectbox(' Choose a category', options=df.columns, 
+                                                                    index=None)
         if category:
-            # Farbe für das Histogramm auswählen
-            hist_color = st.color_picker('Wähle eine Farbe für das Histogramm',"#1f77b4")
-
-            # Erstellen des Histogramms
+            hist_color = st.color_picker('Choose a color for the histogram', 
+                                                                    "#1f77b4")
             fig = px.histogram(df, x=category)
-
-            # Farbe des Histogramms anpassen
             fig.update_traces(marker=dict(color=hist_color))
-
             st.plotly_chart(fig, use_container_width=True)

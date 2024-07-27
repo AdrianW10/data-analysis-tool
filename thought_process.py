@@ -3,28 +3,30 @@ import sys
 import re
 import time
 from io import StringIO
-#Klasse um den Gedankenprozess in einen string umzuwandeln, welcher vom stdout
-#zur Ausgabe durch streamlit umgeleitet wird.
-#Die Methode display_text(self) sorgt dafür dass der Gedankenprozess 
-#schön formattiert ausgegeben wird.
+
+# Class to convert the thought process into a string, which is redirected from 
+# stdout to be displayed by Streamlit.
+# The method display_text(self) ensures that the thought process is nicely 
+# formatted for output.
 class CapturingThoughtProcess(list):
     def __enter__(self):
         self._stdout = sys.stdout
         sys.stdout = self._stringio = StringIO()
         return self
+
     def __exit__(self, *args):
         self.extend(self._stringio.getvalue().splitlines())
-        del self._stringio    #Speicherplatz frei machen
+        del self._stringio    # Free up memory
         sys.stdout = self._stdout
-    def display_text(self):
 
-        # Speichert den gesammelten Text als einen String 
+    def display_text(self):
+        # Save the captured text as a string
         text = " ".join(self)
-        # Filtert nur die relevanten Abschnitte aus dem Gedankenprozess
+        # Filter only the relevant sections from the thought process
         thought = re.search(r"Thought: (.*?)Action:", text)
         action = re.search(r"Action:.*1;3m(.*?)Final Answer:", text)
         #answer = re.search(r"Final Answer: (.*?)\x1b", text)
-        # Ausgabe durch streamlit
+        # Output through Streamlit
         try:
             st.write(f"{thought.group(1)}\n\n")
             time.sleep(0.5)
@@ -32,6 +34,4 @@ class CapturingThoughtProcess(list):
             #time.sleep(0.5)
             #st.success(f"{answer.group(1)}")
         except:
-            st.warning("Gedankenprozess konnte nicht extrahiert werden.")
-            
- 
+            st.warning("Could not extract the thought process.")

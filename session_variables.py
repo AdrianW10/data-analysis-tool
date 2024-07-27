@@ -36,6 +36,8 @@ def initialize_variables():
         st.session_state.token_usage_percent = None
     if 'verbal_summary' not in st.session_state:
         st.session_state.verbal_summary = None
+    if 'exemplary_questions' not in st.session_state:
+        st.session_state.exemplary_questions = None
     if 'data_summary' not in st.session_state:
         st.session_state.data_summary = None
     if 'tab_visited' not in st.session_state:

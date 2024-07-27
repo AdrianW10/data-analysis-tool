@@ -1,41 +1,55 @@
-# AI Datenanalyse-Tool
+# AI Analysis Streamlit App
 
-## Beschreibung
-Dieses Tool bietet eine umfassende Datenanalyse für große Datensätze. 
-Es ermöglicht das Hochladen von CSV-Dateien, die automatische Analyse und die 
-interaktive Datenvisualisierung. Es beinhaltet auch eine Chat-Funktion zur 
-Analyse der Daten im Dialogformat.
+## Description
+This Streamlit application provides an interactive platform for data analysis 
+using Artificial Intelligence. Users can upload data, perform various 
+analyses, and create interactive visualizations.
 
-## Inhaltsverzeichnis
-- [Beschreibung](#beschreibung)
-- [Inhaltsverzeichnis](#inhaltsverzeichnis)
-- [Installation](#installation)
-- [Verwendung](#verwendung)
-- [Funktionen](#funktionen)
-- [Konfiguration](#konfiguration)
+## Features
 
+### 1. Data Upload
+- **Upload CSV Files**: Users can upload CSV files, which are then displayed and 
+analyzed within the app.
 
-## Installation
-Um das Projekt zu installieren, klone das Repository und installiere die Abhängigkeiten:
+### 2. Data Display
+- **Data Preview**: After uploading, the first few rows of the data are 
+displayed.
+- **Data Description**: Statistical metrics such as mean, median, and standard 
+deviation are calculated and shown.
 
-git clone 
+### 3. Data Analysis
+- **Automatic Analysis**: The AI performs automatic analysis of the uploaded 
+data, providing insights and summaries.
+- **Custom Queries**: Users can ask specific questions about the data, which 
+the AI will answer.
 
-pip install -r requirements.txt
+### 4. Data Visualization
+- **Interactive Charts**: The app offers various interactive charts and 
+visualizations based on the uploaded data.
+- **Chart Types**: Supported chart types include scatter plots, line plots, 
+bar charts, and more.
 
-## Verwendung
-Um das Tool auszuführen, benutze den folgenden Befehl:
+## Usage
+1. Visit the application at [https://ai-analysis.streamlit.app/]
+(https://ai-analysis.streamlit.app/).
+2. Upload your CSV file.
+3. Explore the various analysis and visualization options.
+4. Ask custom queries to the AI for specific insights into your data.
 
-streamlit run main.py
+## Requirements
+- A modern web browser (Chrome, Firefox, Edge, Safari)
 
-Alternativ kann das Program auch über folgenden Link aufgerufen werden: 
+## Installation (Local)
+If you wish to run the app locally:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/AdrianW10/data-analysis-tool.git
 
+2. Run the app:   
 
-## Funktionen
-Startseite: Übersicht über die hochgeladenen Daten und deren Zusammenfassung.
-Datenanalyse im Chatformat: Analyse der Daten über eine Chat-Schnittstelle.
-Interaktive Datenvisualisierung: Grafische Darstellung der Daten.
+    streamlit run main.py
 
-## Konfiguration
-Das Tool ist bereits vorkonfiguriert und benötigt keine zusätzlichen Einstellungen. 
-Dennoch kannst du bei Bedarf die Datei 'config.toml' im Ordner '.streamlit' 
-anpassen, um die Farben und Schriftart des Tools zu verändern. 
+## Configuration
+The tool is already preconfigured and requires no further settings. 
+However, if necessary, you can adapt the 'config.toml' file in the '.streamlit' 
+folder to change the colors and font of the tool.

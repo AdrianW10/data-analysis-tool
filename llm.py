@@ -7,26 +7,31 @@ from langchain_openai import ChatOpenAI
 import tiktoken
 import re
 from thought_process import CapturingThoughtProcess
-# Client muss hier nochmal zusätzlich definiert werden
+
+# Client must be defined here again
 load_dotenv()
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-chat = ChatOpenAI(model_name="gpt-4",temperature=0.0)
-example_query = """Frage zum Beispiel:\n
-\t-Was ist der durchschnittliche Wert in Spalte X?\n
-\t-Wie viele Zeilen in Spalte Y haben einen kleineren Wert als 10?\n
-\t-Gibt es einen Zusammenhang zwischen Spalten X und Y?
-"""
+chat = ChatOpenAI(model_name="gpt-4", temperature=0.0)
 
-def use_chatGPT(query):
+pre_promt = """Besides giving a verbal overview 
+                of the data, please also think about a few (3 to 5)
+                sample questions for the data that one could ask an AI to find 
+                out more about the data. Put them in the end of your answer
+                with an header that says 'Exemplary questions:' \n\n"""
 
+pre_promt_no_sum = """Please think about a few (3 to 5)
+                sample questions for the data that one could ask an AI to find 
+                out more about the data. Put them in your answer
+                with an header that says 'Exemplary questions:' \n\n"""
+
+def use_chatGPT(query, option_summary):
     template = {
-                "role": "system", "content": """Sie sind ein hilfreiches Modell, 
-                das Fragen zu einer CSV-Datei beantwortet, basierend auf den 
-                gegebenen Dateninformationen. """, 
+                "role": "system", "content": """You are a helpful model that 
+                answers questions about a CSV file based on the provided data 
+                information. """, 
                 
-                "role": "user", "content": """Bitte sprechen Sie mich mit Adrian 
-                an und duzen Sie mich.\n\n"""
-                
+                "role": "user", "content": f"{pre_promt}" if option_summary 
+                                                else f"{pre_promt_no_sum}"
             }
 
     template["content"] += query
@@ -34,12 +39,12 @@ def use_chatGPT(query):
     response = client.chat.completions.create(
         messages=[template],
         model="gpt-4",
-        stream=True,
+        stream=option_summary,
             )
     return response
 
 def chatbot(option_answer, option_plot, chat_history):
-    # Abbildung der Chathistorie (falls vorhanden) 
+    # Display chat history (if any)
     for message in chat_history:
         with st.chat_message(message["role"]):
             if re.search(r"import", message["content"]):
@@ -48,23 +53,24 @@ def chatbot(option_answer, option_plot, chat_history):
             else:
                 st.markdown(message["content"])
     
-    if prompt := st.chat_input("Sende eine Frage"):
+    if prompt := st.chat_input("Send a question"):
         chat_history.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
     
     if option_answer and option_plot:
-        st.warning("Gedankenprozess kann nicht in Verbindung mit Grafiken angezeigt werden.")
+        st.warning("Thought process cannot be displayed along with graphics.")
     
     if prompt is None and len(chat_history) == 0:
         with st.chat_message("assistant"):
-            st.write("Was möchtest du zu den Daten du wissen?\n\n" + example_query)
+            st.write("What would you like to know about the data?\n\n" + 
+                                        st.session_state.exemplary_questions)
     elif prompt is None:
         with st.chat_message("assistant"):
-            st.write("Was möchtest du zu den Daten du wissen?")
+            st.write("What would you like to know about the data?")
 
     else:
-        with st.spinner("Daten werden analysiert..."):
+        with st.spinner("Analyzing data..."):
             with st.chat_message("assistant"):
                 response = response_manager(option_answer, option_plot, prompt)
                 if not option_plot: 
@@ -74,43 +80,37 @@ def chatbot(option_answer, option_plot, chat_history):
 def response_manager(option_answer, option_plot, prompt):
     if not option_answer and not option_plot:
         response = analyse_csv_data(prompt)
-    elif option_answer and not option_plot:  # Wenn der Gedankenprozess angezeigt werden soll...
-        with CapturingThoughtProcess() as output: # Gedankenprozess wird in einer Instanz der Klasse CapturingThoughtProcess gespeichert 
+    elif option_answer and not option_plot:
+        with CapturingThoughtProcess() as output:
             response = analyse_csv_data(prompt)
-        output.display_text() # Ausgabe des Gedankenprozesses
-    elif option_plot: # Wenn diese Option ausgewählt ist: Spezielle Anweisung, die code für eine Grafik fordert
-        prompt += """\nBitte gebe als Antwort 
-        lediglich den code, der die Grafik erstellt. Ersetze 
-        dabei 'df' durch 'st.session_state.df' und 'plt.show()'
-        durch 'st.pyplot(plt, clear_figure=True)' und stelle 
-        die figsize des Plots auf (10,5)."""
+        output.display_text()
+    elif option_plot:
+        prompt += """\nPlease provide only the code that generates the graphic 
+        as a response. Replace 'df' with 'st.session_state.df' and 'plt.show()' 
+        with 'st.pyplot(plt, clear_figure=True)' and set the plot's figsize 
+        to (10,5)."""
         
         code = analyse_csv_data(prompt)
-        fixed_code = re.search(r"```python(.*)```", code, re.DOTALL) # Code für Grafik wird bereinigt
-        try: response = fixed_code.group(1); exec(fixed_code.group(1)) # Code für Grafik wird ausgeführt
-        except: st.error("Etwas ist schief gelaufen, probiere es nochmal.")
+        fixed_code = re.search(r"```python(.*)```", code, re.DOTALL)
+        try: response = fixed_code.group(1); exec(fixed_code.group(1))
+        except: st.error("Something went wrong, please try again.")
     return response
 
-# Methode, um einen Input (query) an ChatGPT mittels langchain Schnittstelle zu übergeben 
 def analyse_csv_data(query):
-    
     agent = create_pandas_dataframe_agent(chat, 
         st.session_state.df if st.session_state.df_filtered is None 
         else st.session_state.df_filtered, 
         verbose=True,
         ) 
-    response = agent.run("Bitte beantworte folgende Frage auf deutsch: " + query)
+    response = agent.run(query)
     
     return response
 
 def calc_token_usage(model="gpt-4"):
     df_string = st.session_state.df.head(6).to_string(index=False)
-    query = """Dies ist eine Beispielanfrage, die von der Anzahl der Tokens 
-                    ungefähr einer durchschnittlichen Anfrage zum Datensatz 
-                    entsprechen soll. Zur Sicherheit mache ich sie noch etwas
-                    länger denn man weiß ja nie. Außerdem kommen ja noch die 
-                    Dictionarys als String dazu. Deswegen kann es ruhig noch 
-                    etwas länger sein."""
+    query = """This is an example query that should roughly correspond to the 
+    average token count of a typical dataset query. 
+    To be safe, I'll make it a bit longer"""
     combined_input = f"{query}\n\nData:\n{df_string}"
 
     encoding = tiktoken.encoding_for_model(model)
@@ -119,6 +119,6 @@ def calc_token_usage(model="gpt-4"):
     st.session_state.num_tokens = len(tokens)
 
     MAX_TOKENS = 8192  
-    st.session_state.token_usage_percent = int((st.session_state.num_tokens / MAX_TOKENS) * 100)
-
-    
+    st.session_state.token_usage_percent = int(
+                                (st.session_state.num_tokens / MAX_TOKENS) * 100
+                                            )
