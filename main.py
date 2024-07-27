@@ -92,7 +92,8 @@ elif menu == "Data Analysis":
                                                 multicat=True, 
                                                 subcat=False,
                                                 )
-                st.session_state.df_filtered = filter_data(st.session_state.df[categories], categories)
+                st.session_state.df_filtered = filter_data(
+                    st.session_state.df[categories], categories)
                 
                 col1, col2 = st.columns([1, 1])
                 with col1:
@@ -102,7 +103,8 @@ elif menu == "Data Analysis":
                     st.info("Learn more about your filtered data")
                     option_answer = st.checkbox("Show Thought Process")
                     option_plot = st.checkbox("Create Chart")
-                    chatbot(option_answer, option_plot, st.session_state.messages1)
+                    chatbot(option_answer, option_plot, 
+                            st.session_state.messages1)
         else:
             st.error("Data cannot be processed")
            
@@ -132,7 +134,8 @@ elif menu == "Interactive Data Visualization":
                                                 multicat=True, 
                                                 subcat=False,
                                                 )
-                st.session_state.df_filtered = filter_data(st.session_state.df[categories], categories)
+                st.session_state.df_filtered = filter_data(
+                    st.session_state.df[categories], categories)
                 interactive_plot(st.session_state.df_filtered, True)
         else:
             st.error("Data cannot be processed")

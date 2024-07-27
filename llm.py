@@ -14,12 +14,12 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 chat = ChatOpenAI(model_name="gpt-4", temperature=0.0)
 
 pre_promt = """Besides giving a verbal overview 
-                of the data, please also think about a few (3 to 5)
+                of the data, please also think about a few (maximum 5)
                 sample questions for the data that one could ask an AI to find 
                 out more about the data. Put them in the end of your answer
                 with an header that says 'Exemplary questions:' \n\n"""
 
-pre_promt_no_sum = """Please think about a few (3 to 5)
+pre_promt_no_sum = """Please think about a few (maximum 5)
                 sample questions for the data that one could ask an AI to find 
                 out more about the data. Put them in your answer
                 with an header that says 'Exemplary questions:' \n\n"""
@@ -30,9 +30,8 @@ def use_chatGPT(query, option_summary):
                 answers questions about a CSV file based on the provided data 
                 information. """, 
                 
-                "role": "user", "content": f"{pre_promt}" if option_summary 
-                                                else f"{pre_promt_no_sum}"
-            }
+                "role": "user", "content": f"{pre_promt}" if option_summary else f"{pre_promt_no_sum}"
+                }
 
     template["content"] += query
     
@@ -100,7 +99,7 @@ def analyse_csv_data(query):
     agent = create_pandas_dataframe_agent(chat, 
         st.session_state.df if st.session_state.df_filtered is None 
         else st.session_state.df_filtered, 
-        verbose=True,
+        verbose=True
         ) 
     response = agent.run(query)
     
@@ -120,5 +119,4 @@ def calc_token_usage(model="gpt-4"):
 
     MAX_TOKENS = 8192  
     st.session_state.token_usage_percent = int(
-                                (st.session_state.num_tokens / MAX_TOKENS) * 100
-                                            )
+                            (st.session_state.num_tokens / MAX_TOKENS) * 100)
